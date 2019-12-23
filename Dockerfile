@@ -3,11 +3,14 @@ LABEL maintainer="Robin Cole @robmarkcole"
 
 EXPOSE 8501
 
-WORKDIR /app
+RUN mkdir -p /home/streamlit
+WORKDIR /home/streamlit
+
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY ./src /src
+COPY . /home/streamlit
+
 ENTRYPOINT [ "streamlit", "run"]
-CMD ["/src/app.py"]
+CMD ["src/app.py"]
