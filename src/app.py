@@ -8,6 +8,7 @@ from const import CLASSES, COLORS
 from settings import DEFAULT_CONFIDENCE_THRESHOLD, DEMO_IMAGE, MODEL, PROTOTXT
 
 
+@st.cache
 def process_image(image):
     blob = cv2.dnn.blobFromImage(
         cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5
@@ -18,6 +19,7 @@ def process_image(image):
     return detections
 
 
+@st.cache
 def annotate_image(
     image, detections, confidence_threshold=DEFAULT_CONFIDENCE_THRESHOLD
 ):
@@ -46,7 +48,11 @@ def annotate_image(
     return image, labels
 
 
+st.title("Object detection with MobileNet SSD")
 img_file_buffer = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+confidence_threshold = st.slider(
+    "Confidence threshold", 0.0, 1.0, DEFAULT_CONFIDENCE_THRESHOLD, 0.05
+)
 
 if img_file_buffer is not None:
     image = np.array(Image.open(img_file_buffer))
@@ -56,10 +62,10 @@ else:
     image = np.array(Image.open(demo_image))
 
 detections = process_image(image)
-image, labels = annotate_image(image, detections)
-st.write(labels)
+image, labels = annotate_image(image, detections, confidence_threshold)
 
 st.image(
     image, caption=f"Processed image", use_column_width=True,
 )
 
+st.write(labels)
